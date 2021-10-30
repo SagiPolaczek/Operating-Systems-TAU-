@@ -49,10 +49,6 @@ void* phys_to_virt(uint64_t phys_addr)
 
 int main(int argc, char **argv)
 {
-	int intim[5];
-	for (int i = 0; i < 5; i++) {
-		intim[4-i] = i;
-	}
 	uint64_t pt = alloc_page_frame();
 
 	assert(page_table_query(pt, 0xcafe) == NO_MAPPING);

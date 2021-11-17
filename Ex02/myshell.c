@@ -33,11 +33,11 @@ int prepare()
     status = sigaction(SIGINT, &null_action, NULL);
     // TODO: handle status
 
-    // struct sigaction chld_action;
-    // memset(&chld_action, 0, sizeof(chld_action));
-    // chld_action.sa_handler = zombie_handler;
-    // chld_action.sa_flags = SA_RESTART;
-    // status = sigaction(SIGCHLD, &chld_action, NULL);
+    struct sigaction chld_action;
+    memset(&chld_action, 0, sizeof(chld_action));
+    chld_action.sa_handler = zombie_handler;
+    chld_action.sa_flags = SA_RESTART;
+    status = sigaction(SIGCHLD, &chld_action, NULL);
     // TODO: handle status
 
     if (status < 0) {

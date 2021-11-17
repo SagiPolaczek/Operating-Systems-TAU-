@@ -12,6 +12,7 @@
 #define STATUS_SUCCESS 0
 #define STATUS_FAILURE -1
 
+// Enums for cases' readability
 typedef enum Case {
     case_DEFAULT,
     case_AND,
@@ -19,28 +20,31 @@ typedef enum Case {
     case_REDIRECT
 } Case;
 
+// Additional functions declaration
 Case get_case(int count, char** arglist);
 void my_signal_handler(int signum);
 void zombie_handler(int signum);
 
 int prepare()
 {
-    int status;
+    int status0, status1;
+
+    // Nullify the SIGINT signal.
     struct sigaction null_action;
     memset(&null_action, 0, sizeof(null_action));
     null_action.sa_handler = my_signal_handler;
     null_action.sa_flags = SA_RESTART;
-    status = sigaction(SIGINT, &null_action, NULL);
-    // TODO: handle status
+    status0 = sigaction(SIGINT, &null_action, NULL);
 
+    // Modify SIGCHLD to handle zombies
     struct sigaction chld_action;
     memset(&chld_action, 0, sizeof(chld_action));
     chld_action.sa_handler = zombie_handler;
     chld_action.sa_flags = SA_RESTART;
-    status = sigaction(SIGCHLD, &chld_action, NULL);
-    // TODO: handle status
+    status1 = sigaction(SIGCHLD, &chld_action, NULL);
 
-    if (status < 0) {
+    if (status0 + status1 < 0) {
+        perror("Error, sigaction.");
         return STATUS_FAILURE;
     }
     return STATUS_SUCCESS;
@@ -49,38 +53,43 @@ int prepare()
 
 int process_arglist(int count, char** arglist)
 {
-    int pid, status;
+    int pid, pid_child, status, symbol_index;
     Case curr_case = get_case(count, arglist);
 
     switch (curr_case) 
     {
         case case_DEFAULT:
-            printf("case_DEFAULT\n"); // TODO: delete
             pid = fork();
             if (pid == 0) {
                 signal(SIGINT, SIG_DFL);
                 execvp(arglist[0], arglist);
+                perror("Error, execvp:");
+                exit(1);
             } else {
                 wait(&status);
+                if (status < 1) {
+                    perror("Error, wait:");
+                }
                 return 1;
             }
             break;
 
         case case_AND:
-            printf("case_AND\n"); // TODO: delete
             pid = fork();
             if (pid == 0) {
 
                 arglist[count - 1] = NULL;
                 execvp(arglist[0], arglist);
+                perror("Error, execvp:");
+                exit(1);
             } else {
                 return 1;
             }
             break;
         
         case case_PIPE:
-            printf("case_PIPE\n"); // TODO: delete
-            int pid_child, symbol_index = 0;
+            pid_child = 0;
+            symbol_index = 0;
             for (int i = 0; i < count; i++) {
                 // Locate and save the '|'s index
                 symbol_index = arglist[i][0] == '|' ? i : symbol_index;
@@ -92,6 +101,10 @@ int process_arglist(int count, char** arglist)
 
             int pipefd[2]; // 0 - read, 1 - write
             status = pipe(pipefd);
+            if (status < 1) {
+                perror("Error, pipe:");
+            }
+
             int readerfd = pipefd[0];
             int writerfd = pipefd[1];
             
@@ -102,6 +115,8 @@ int process_arglist(int count, char** arglist)
                 dup2(writerfd, 1);
                 close(writerfd);
                 execvp(first_arglist[0], first_arglist);
+                perror("Error, execvp:");
+                exit(1);
 
             } else { 
                 pid_child = fork();
@@ -111,14 +126,21 @@ int process_arglist(int count, char** arglist)
                     dup2(readerfd, 0);
                     close(readerfd);
                     execvp(second_arglist[0], second_arglist);
-                    perror("execvp");
+                    perror("Error, execvp:");
                     exit(1);
 
                 } else { // Parent
                     close(writerfd);
                     close(readerfd);
+
                     waitpid(pid, &status, 0);
+                    if (status < 1) {
+                        perror("Error, waitpid:");
+                    }
                     waitpid(pid_child, &status, 0);
+                    if (status < 1) {
+                        perror("Error, waitpid:");
+                    }
                     return 1;
                 }
 
@@ -137,8 +159,13 @@ int process_arglist(int count, char** arglist)
                 signal(SIGINT, SIG_DFL);
                 dup2(fd, 1);
                 execvp(arglist[0], arglist);
+                perror("Error, execvp:");
+                exit(1);
             } else {
                 wait(&status);
+                if (status < 1) {
+                    perror("Error, wait:");
+                }
                 return 1;
             }
             break;
@@ -179,7 +206,6 @@ Case get_case(int count, char** arglist)
 
 void my_signal_handler(int signum)
 {
-    printf("\n42 <3\n");
     return;
 }
 
@@ -187,4 +213,7 @@ void zombie_handler(int signum)
 {
     int status;
     waitpid(-1, &status, WNOHANG);
+    if (status < 1) {
+        perror("Error, waitpid:");
+    }
 }

@@ -80,7 +80,7 @@ int process_arglist(int count, char** arglist)
         
         case case_PIPE:
             printf("case_PIPE\n"); // TODO: delete
-            int symbol_index, pid_child = 0;
+            int pid_child, symbol_index = 0;
             for (int i = 0; i < count; i++) {
                 // Locate and save the '|'s index
                 symbol_index = arglist[i][0] == '|' ? i : symbol_index;

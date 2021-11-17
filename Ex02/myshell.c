@@ -115,6 +115,7 @@ int process_arglist(int count, char** arglist)
                 } else { // Parent
                     waitpid(pid, &status, 0);
                     waitpid(pid_child, &status, 0);
+                    return 1;
                 }
             }
 

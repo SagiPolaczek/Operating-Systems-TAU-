@@ -40,6 +40,9 @@ int prepare()
     // status = sigaction(SIGCHLD, &chld_action, NULL);
     // TODO: handle status
 
+    if (status < 0) {
+        return STATUS_FAILURE;
+    }
     return STATUS_SUCCESS;
 }
 

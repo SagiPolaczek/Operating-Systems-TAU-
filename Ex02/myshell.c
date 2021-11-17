@@ -100,23 +100,28 @@ int process_arglist(int count, char** arglist)
                 signal(SIGINT, SIG_DFL);
                 close(readerfd);
                 dup2(writerfd, 1);
-                execvp(first_arglist[0], first_arglist);
                 close(writerfd);
+                execvp(first_arglist[0], first_arglist);
 
             } else { 
                 pid_child = fork();
                 if (pid_child == 0) { // Child 2 - read from pipe
                     signal(SIGINT, SIG_DFL);
                     close(writerfd); 
-                    dup2(readerfd, 0);  
-                    execvp(second_arglist[0], second_arglist);
+                    dup2(readerfd, 0);
                     close(readerfd);
+                    execvp(second_arglist[0], second_arglist);
+                    perror("execvp");
+                    exit(1);
 
                 } else { // Parent
+                    close(writerfd);
+                    close(readerfd);
                     waitpid(pid, &status, 0);
                     waitpid(pid_child, &status, 0);
                     return 1;
                 }
+
             }
 
             break;

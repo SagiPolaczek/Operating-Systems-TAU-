@@ -96,27 +96,26 @@ int process_arglist(int count, char** arglist)
             int writerfd = pipefd[1];
             
             pid = fork();
-            if (pid == 0) {
-                pid_child = fork();
-                
-                if (pid_child == 0) { // Child 1 - writes to pipe
-                    signal(SIGINT, SIG_DFL);
-                    close(readerfd);
-                    dup2(writerfd, 1);
-                    execvp(first_arglist[0], first_arglist);
-                    close(writerfd);
+            if (pid == 0) { // Child 1 - writes to pipe
+                signal(SIGINT, SIG_DFL);
+                close(readerfd);
+                dup2(writerfd, 1);
+                execvp(first_arglist[0], first_arglist);
+                close(writerfd);
 
-                } else { // Child 2 - read from pipe
+            } else { 
+                pid_child = fork();
+                if (pid_child == 0) { // Child 2 - read from pipe
                     signal(SIGINT, SIG_DFL);
                     close(writerfd); 
                     dup2(readerfd, 0);  
                     execvp(second_arglist[0], second_arglist);
                     close(readerfd);
-                }
 
-            } else { // Parent
-                waitpid(pid, &status, 0);
-                waitpid(pid_child, &status, 0);
+                } else { // Parent
+                    waitpid(pid, &status, 0);
+                    waitpid(pid_child, &status, 0);
+                }
             }
 
             break;

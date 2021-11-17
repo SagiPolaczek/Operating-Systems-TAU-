@@ -80,7 +80,7 @@ int process_arglist(int count, char** arglist)
         
         case case_PIPE:
             printf("case_PIPE\n"); // TODO: delete
-            int symbol_index = 0;
+            int symbol_index, pid_child = 0;
             for (int i = 0; i < count; i++) {
                 // Locate and save the '|'s index
                 symbol_index = arglist[i][0] == '|' ? i : symbol_index;
@@ -97,7 +97,7 @@ int process_arglist(int count, char** arglist)
             
             pid = fork();
             if (pid == 0) {
-                int pid_child = fork();
+                pid_child = fork();
                 
                 if (pid_child == 0) { // Child 1 - writes to pipe
                     signal(SIGINT, SIG_DFL);
@@ -115,7 +115,8 @@ int process_arglist(int count, char** arglist)
                 }
 
             } else { // Parent
-                wait(&status);
+                waitpid(pid, &status, 0);
+                waitpid(pid_child, &status, 0);
             }
 
             break;

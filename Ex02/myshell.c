@@ -15,7 +15,7 @@
 // Enums for cases' readability
 typedef enum Case {
     case_DEFAULT,
-    case_AND,
+    case_BACKGROUND,
     case_PIPE,
     case_REDIRECT
 } Case;
@@ -23,7 +23,7 @@ typedef enum Case {
 // Additional functions declaration
 Case get_case(int count, char** arglist);
 void my_signal_handler(int signum);
-void zombie_handler(int signum);
+void my_zombie_handler(int signum);
 
 int prepare()
 {
@@ -32,13 +32,14 @@ int prepare()
     // Nullify the SIGINT signal.
     struct sigaction null_action;
     memset(&null_action, 0, sizeof(null_action));
+    null_action.sa_handler = SIG_IGN;
     null_action.sa_flags = SA_RESTART;
     status0 = sigaction(SIGINT, &null_action, NULL);
 
     // Modify SIGCHLD to handle zombies
     struct sigaction chld_action;
     memset(&chld_action, 0, sizeof(chld_action));
-    chld_action.sa_handler = zombie_handler;
+    chld_action.sa_handler = my_zombie_handler;
     chld_action.sa_flags = SA_RESTART;
     status1 = sigaction(SIGCHLD, &chld_action, NULL);
 
@@ -60,6 +61,10 @@ int process_arglist(int count, char** arglist)
     {
         case case_DEFAULT:
             pid = fork();
+            if (pid < 0) {
+                perror("Error, fork:");
+                exit(1);
+            }
             if (pid == 0) {
                 signal(SIGINT, SIG_DFL);
                 execvp(arglist[0], arglist);
@@ -74,16 +79,19 @@ int process_arglist(int count, char** arglist)
             }
             break;
 
-        case case_AND:
+        case case_BACKGROUND:
             pid = fork();
+            if (pid < 0) {
+                perror("Error, fork:");
+                exit(1);
+            }
             if (pid == 0) {
                 arglist[count - 1] = NULL;
                 execvp(arglist[0], arglist);
                 perror("Error, execvp:");
                 exit(1);
-            } else {
-                return 1;
             }
+            return 1;
             break;
         
         case case_PIPE:
@@ -108,6 +116,10 @@ int process_arglist(int count, char** arglist)
             int writerfd = pipefd[1];
             
             pid = fork();
+            if (pid < 0) {
+                perror("Error, fork:");
+                exit(1);
+            }
             if (pid == 0) { // Child 1 - writes to pipe
                 signal(SIGINT, SIG_DFL);
                 close(readerfd);
@@ -119,6 +131,10 @@ int process_arglist(int count, char** arglist)
 
             } else { 
                 pid_child = fork();
+                if (pid < 0) {
+                    perror("Error, fork:");
+                    exit(1);
+                }
                 if (pid_child == 0) { // Child 2 - read from pipe
                     signal(SIGINT, SIG_DFL);
                     close(writerfd); 
@@ -152,6 +168,10 @@ int process_arglist(int count, char** arglist)
             int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY, 0600);
             arglist[count - 2] = NULL;
             pid = fork();
+            if (pid < 0) {
+                perror("Error, fork:");
+                exit(1);
+            }
             
             if (pid == 0) {
                 signal(SIGINT, SIG_DFL);
@@ -189,7 +209,7 @@ Case get_case(int count, char** arglist)
         return case_DEFAULT;
     }
     if (arglist[count - 1][0] == '&') {
-        return case_AND;
+        return case_BACKGROUND;
     }
     if (arglist[count - 2][0] == '>') {
         return case_REDIRECT;
@@ -207,7 +227,7 @@ void my_signal_handler(int signum)
     return;
 }
 
-void zombie_handler(int signum)
+void my_zombie_handler(int signum)
 {
     int status;
     waitpid(-1, &status, WNOHANG);

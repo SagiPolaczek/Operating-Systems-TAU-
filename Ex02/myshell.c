@@ -54,6 +54,7 @@ int prepare()
 int process_arglist(int count, char** arglist)
 {
     int pid, pid_child, status, symbol_index;
+    char* file_name;
     Case curr_case = get_case(count, arglist);
 
     switch (curr_case) 
@@ -67,7 +68,7 @@ int process_arglist(int count, char** arglist)
                 exit(1);
             } else {
                 wait(&status);
-                if (status < 1 && errno != ECHILD) {
+                if (status < 0 && errno != ECHILD) {
                     perror("Error, wait:");
                 }
                 return 1;
@@ -101,7 +102,7 @@ int process_arglist(int count, char** arglist)
 
             int pipefd[2]; // 0 - read, 1 - write
             status = pipe(pipefd);
-            if (status < 1) {
+            if (status < 0) {
                 perror("Error, pipe:");
             }
 
@@ -134,11 +135,11 @@ int process_arglist(int count, char** arglist)
                     close(readerfd);
 
                     waitpid(pid, &status, 0);
-                    if (status < 1 && errno != ECHILD) {
+                    if (status < 0 && errno != ECHILD) {
                         perror("Error, waitpid:");
                     }
                     waitpid(pid_child, &status, 0);
-                    if (status < 1 && errno != ECHILD) {
+                    if (status < 0 && errno != ECHILD) {
                         perror("Error, waitpid:");
                     }
                     return 1;
@@ -149,8 +150,7 @@ int process_arglist(int count, char** arglist)
             break;
 
         case case_REDIRECT:
-            printf("case_REDIRECT\n"); // TODO: delete
-            char* file_name = arglist[count - 1];
+            file_name = arglist[count - 1];
             int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY, 0600);
             arglist[count - 2] = NULL;
             pid = fork();
@@ -163,7 +163,7 @@ int process_arglist(int count, char** arglist)
                 exit(1);
             } else {
                 wait(&status);
-                if (status < 1 && errno != ECHILD) {
+                if (status < 0 && errno != ECHILD) {
                     perror("Error, wait:");
                 }
                 return 1;
@@ -213,7 +213,7 @@ void zombie_handler(int signum)
 {
     int status;
     waitpid(-1, &status, WNOHANG);
-    if (status < 1 && errno != ECHILD) {
+    if (status < 0 && errno != ECHILD) {
         perror("Error, waitpid:");
     }
 }

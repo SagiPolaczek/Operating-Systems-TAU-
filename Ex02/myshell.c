@@ -22,7 +22,6 @@ typedef enum Case {
 
 // Additional functions declaration
 Case get_case(int count, char** arglist);
-void my_signal_handler(int signum);
 void my_zombie_handler(int signum);
 
 int prepare()
@@ -57,6 +56,7 @@ int process_arglist(int count, char** arglist)
     char* file_name;
     Case curr_case = get_case(count, arglist);
 
+    // Switch-cases design
     switch (curr_case) 
     {
         case case_DEFAULT:
@@ -103,6 +103,7 @@ int process_arglist(int count, char** arglist)
             }
             arglist[symbol_index] = NULL;
 
+            // Seperate to the two diff commands
             char** first_arglist = arglist;
             char** second_arglist = arglist + symbol_index + 1;
 
@@ -165,6 +166,7 @@ int process_arglist(int count, char** arglist)
 
         case case_REDIRECT:
             file_name = arglist[count - 1];
+            // Open file
             int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY, 0600);
             arglist[count - 2] = NULL;
             pid = fork();
@@ -220,11 +222,6 @@ Case get_case(int count, char** arglist)
         }
     }
     return case_DEFAULT;
-}
-
-void my_signal_handler(int signum)
-{
-    return;
 }
 
 void my_zombie_handler(int signum)

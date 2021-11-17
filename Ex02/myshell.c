@@ -123,7 +123,7 @@ int process_arglist(int count, char** arglist)
         case case_REDIRECT:
             printf("case_REDIRECT\n"); // TODO: delete
             char* file_name = arglist[count - 1];
-            int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY);
+            int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY | 0600);
             arglist[count - 2] = NULL;
             pid = fork();
             

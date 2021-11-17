@@ -32,7 +32,6 @@ int prepare()
     // Nullify the SIGINT signal.
     struct sigaction null_action;
     memset(&null_action, 0, sizeof(null_action));
-    null_action.sa_handler = my_signal_handler;
     null_action.sa_flags = SA_RESTART;
     status0 = sigaction(SIGINT, &null_action, NULL);
 
@@ -78,7 +77,6 @@ int process_arglist(int count, char** arglist)
         case case_AND:
             pid = fork();
             if (pid == 0) {
-
                 arglist[count - 1] = NULL;
                 execvp(arglist[0], arglist);
                 perror("Error, execvp:");

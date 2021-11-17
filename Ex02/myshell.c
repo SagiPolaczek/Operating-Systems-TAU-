@@ -80,7 +80,7 @@ int process_arglist(int count, char** arglist)
         
         case case_PIPE:
             printf("case_PIPE\n"); // TODO: delete
-            int symbol_index;
+            int symbol_index = 0;
             for (int i = 0; i < count; i++) {
                 // Locate and save the '|'s index
                 symbol_index = arglist[i][0] == '|' ? i : symbol_index;
@@ -91,7 +91,7 @@ int process_arglist(int count, char** arglist)
             char** second_arglist = arglist + symbol_index + 1;
 
             int pipefd[2]; // 0 - read, 1 - write
-            pipe(pipefd);
+            status = pipe(pipefd);
             int readerfd = pipefd[0];
             int writerfd = pipefd[1];
             

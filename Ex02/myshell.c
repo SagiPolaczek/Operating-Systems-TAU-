@@ -183,6 +183,7 @@ int process_arglist(int count, char** arglist)
                 exit(1);
             } else {
                 wait(&status);
+                close(fd);
                 if (status < 0 && errno != ECHILD) {
                     perror("Error, wait:");
                 }

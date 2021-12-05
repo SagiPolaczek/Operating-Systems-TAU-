@@ -5,10 +5,6 @@
 #undef MODULE
 #define MODULE
 
-#include <errno.h>
-
-MODULE_LICENSE("GPL");
-
 #define SUCCESS 0
 #define FAILURE -1
 #define DEVICE_RANGE_NAME "message_slot"
@@ -16,13 +12,14 @@ MODULE_LICENSE("GPL");
 #define MINOR_AMOUNT_LIMIT 257
 #define DEVICE_FILE_NAME "message_slot"
 #define MAJOR_NUM 240
+#define MSG_SLOT_CHANNEL _IOW(MAJOR_NUM, 0, unsigned int)
 
 typedef struct channel_node {
     int minor;
     int channel_id; // key
     char msg_buffer[BUFFER_SIZE]; // ????
-    int msg_size = -1;
-    channel_node* next = NULL;
+    int msg_size;
+    struct channel_node* next;
 } channel_node;
 
 typedef struct file_p_data {

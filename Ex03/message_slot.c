@@ -8,6 +8,8 @@
 #include <linux/slab.h>
 #include <linux/ioctl.h>
 
+MODULE_LICENSE("GPL");
+
 
 channel_node* find_channel_node(channel_node** ch_slots, int minor, int channel_id);
 
@@ -54,8 +56,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
 
     // Check msg ch id validation   
     if (channel_id == 0) {
-        errno = EINVAL;
-        return FAILURE;
+        return -EINVAL;
     }
 
     // get minor
@@ -64,14 +65,12 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     // find channel node, if exist
     channel_node* node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL)  {
-        errno = ENOSPC;
-        return FAILURE;
+        return -ENOSPC;
     }
 
     int msg_size = node -> msg_size;
     if (length < msg_size) {
-        errno = ENOSPC;
-        return FAILURE;
+        return -ENOSPC;
     }
 
     // Read msg
@@ -96,15 +95,13 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     printk("Initiating 'device_write'.");
     // Check msg length validation
     if (length <= 0 || length > 128) {
-        errno = EMSGSIZE;
-        return FAILURE;
+        return -EMSGSIZE;
     }
 
     int channel_id = ((file_p_data*) file -> private_data) -> channel_id;
     // Check msg ch id validation   
     if (channel_id == 0) {
-        errno = EINVAL;
-        return FAILURE;
+        return -EINVAL;
     }
 
     // Get minor from file's private data
@@ -143,8 +140,7 @@ static long device_ioctl(struct file* file, unsigned int ioctl_command_id, unsig
         return SUCCESS;
     }
 
-    errno = EINVAL;
-    return FAILURE;
+    return -EINVAL;
 }
 
 //==================== DEVICE SETUP =============================

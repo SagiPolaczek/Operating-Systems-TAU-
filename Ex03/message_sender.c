@@ -1,8 +1,14 @@
 
 #include "message_slot.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
+#include <sys/fcntl.h> 
+#include <sys/ioctl.h>      
+#include <unistd.h>     
 
 int main(int argc, char **argv)
 {
@@ -14,8 +20,7 @@ int main(int argc, char **argv)
 
     // parsing arguments
     char* msg_slot_file_path = argv[1];
-    unsigned int target_msg_channel_id;
-    sscanf(argv[2], "%p", &target_msg_channel_id);
+    unsigned int target_msg_channel_id = atoi(argv[2]);
     char* msg = argv[3];
     int length = strlen(msg);
 

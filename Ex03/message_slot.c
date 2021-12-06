@@ -36,7 +36,7 @@ static int device_open(struct inode* inode, struct file*  file)
 //---------------------------------------------------------------
 static int device_release(struct inode* inode, struct file*  file)
 {
-    printk("Initiating 'device_open'.\n");
+    printk("%s: Initiating 'device_open'.\n", DEVICE_FILE_NAME);
     kfree(file -> private_data);
     return SUCCESS;
 }
@@ -51,7 +51,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     channel_node* node;
     char* msg_buffer;
 
-    printk("Initiating 'device_read'.\n");
+    printk("%s: Initiating 'device_read'.\n", DEVICE_FILE_NAME);
 
     // get channel id
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
@@ -98,7 +98,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     char* msg_buffer;
     channel_node* node;
 
-    printk("Initiating 'device_write'.\n");
+    printk("%s: Initiating 'device_write'.\n", DEVICE_FILE_NAME);
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;
@@ -134,7 +134,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 //----------------------------------------------------------------
 static long device_ioctl(struct file* file, unsigned int ioctl_command_id, unsigned long ioctl_param )
 {
-    printk("Initiating 'device_ioctl'.\n");
+    printk("%s: Initiating 'device_ioctl'.\n", DEVICE_FILE_NAME);
 
     // Switch according to the ioctl called
     if( ioctl_command_id == MSG_SLOT_CHANNEL && ioctl_param != 0) {
@@ -170,15 +170,16 @@ static int __init device_init(void)
     printk("%s: Initiating 'device_init'.\n", DEVICE_FILE_NAME);
 
     // Register driver capabilities. Obtain major num
-    status = register_chrdev( MAJOR_NUM, DEVICE_RANGE_NAME, &fops );
+    status = register_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME, &fops );
 
     // Negative values signify an error
-    if ( status <=FAILURE ) {
+    if ( status <= FAILURE ) {
     printk(KERN_ERR "%s registraion failed for  %d\n",
                         DEVICE_FILE_NAME, MAJOR_NUM );
     return FAILURE;
     }
 
+    printk("%s: Done - 'device_init'.\n", DEVICE_FILE_NAME);
     return SUCCESS;
 }
 
@@ -194,6 +195,7 @@ static void __exit device_cleanup(void)
     // Unregister the device
     // Should always succeed
     unregister_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME);
+    printk("%s: Done - 'device_cleanup'.\n", DEVICE_FILE_NAME);
 }
 
 

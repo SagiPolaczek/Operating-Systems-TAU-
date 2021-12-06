@@ -10,9 +10,6 @@
 
 MODULE_LICENSE("GPL");
 
-
-channel_node* find_channel_node(channel_node** ch_slots, int minor, int channel_id);
-
 // Keep an array of 256 entries.
 // The i'th entry contains a POINTER for a channel's SLL of the minor 'i'.
 channel_node* ch_slots[MINOR_AMOUNT_LIMIT];

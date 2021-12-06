@@ -237,7 +237,7 @@ channel_node* insert_channel_node(channel_node** ch_slots, int minor, int channe
 // TODO: implement free function
 int free_sll(channel_node* head_node) {
     channel_node* curr_node = head_node;
-    channel_node next_node;
+    channel_node* next_node;
     if (head_node == NULL) {
         return SUCCESS;
     }

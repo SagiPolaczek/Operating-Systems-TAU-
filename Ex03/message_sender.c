@@ -27,21 +27,23 @@ int main(int argc, char **argv)
     // Open file
     int fd = open(msg_slot_file_path, O_WRONLY);
     if (fd < 0) {
-        // TODO: perror
+        perror("sender: Error has occured while opening the file\n");
         exit(1);
     }
     
     // Set channel id
     status = ioctl(fd, MSG_SLOT_CHANNEL, target_msg_channel_id);
     if (status != SUCCESS) {
-        // TODO: perror
+        perror("sender: Error has occured while executing ioctl\n");
         exit(1);
     }
 
     // Write
+    printf("sender: Writing msg. slot_path = %s, channel_id = %d, msg's length = %d.\n",
+                                        msg_slot_file_path, target_msg_channel_id, length);
     status = write(fd, msg, length);
     if (status != length) {
-        // TODO: perror
+        perror("sender: Error has occured while writing the msg\n");
         exit(1);
     }
 

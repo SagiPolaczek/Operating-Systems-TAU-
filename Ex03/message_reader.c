@@ -26,26 +26,27 @@ int main(int argc, char **argv)
 
     int fd = open(msg_slot_file_path, O_RDONLY);
     if (fd < 0) {
-        // TODO: perror msg
+        perror("reader: Error has occured while opening the file\n");
         exit(1);
     }
 
     status = ioctl(fd, MSG_SLOT_CHANNEL, target_msg_channel_id);
     if (status != SUCCESS) {
-        // TODO: perror msg
+        perror("reader: Error has occured while executing ioctl\n");
         exit(1);
     }
 
     char buffer[BUFFER_SIZE];
     total_written = read(fd, buffer, BUFFER_SIZE);
+    printf("reader: total_written = %d\n", total_written);
     if (status < SUCCESS) {
-        // TODO: perror msg
+        perror("reader: Error has occured while reading the msg\n");
         exit(1);
     }
 
     status = write(STDOUT_FILENO, buffer, total_written);
     if (status == FAILURE) {
-        // TODO: perror
+        perror("reader: Error has occured while printing the msg\n");
         exit(1);
     }
 

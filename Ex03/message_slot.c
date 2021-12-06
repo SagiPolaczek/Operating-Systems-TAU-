@@ -81,7 +81,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     // Read msg
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < length; i++) {
-        status = put_user(msg_buffer[i], buffer[i]); // maybe need fix
+        status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
         if (status != SUCCESS) {
             // TODO: raise error
         }
@@ -124,7 +124,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     // Write msg
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < length; i++) {
-        status = put_user(buffer[i], msg_buffer[i]); // maybe need fix
+        status = put_user(buffer[i], &msg_buffer[i]); // maybe need fix
         if (status != SUCCESS) {
             // TODO: raise error
         }

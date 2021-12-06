@@ -44,8 +44,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    status = write(STDOUT_FILENO, buffer, total_read);
-    printf("reader: total write to console = %d\n", total_read);
+    status = write(1, buffer, total_read);
+    printf("reader: total write to console = %d\n", status);
     if (status == FAILURE) {
         perror("reader: Error has occured while printing the msg\n");
         exit(1);

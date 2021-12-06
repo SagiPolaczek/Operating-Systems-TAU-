@@ -15,7 +15,7 @@ channel_node* find_channel_node(channel_node** ch_slots, int minor, int channel_
 
 // Keep an array of 256 entries.
 // The i'th entry contains a POINTER for a channel's SLL of the minor 'i'.
-channel_node** ch_slots[MINOR_AMOUNT_LIMIT];
+channel_node* ch_slots[MINOR_AMOUNT_LIMIT];
 
 //================== DEVICE FUNCTIONS ===========================
 static int device_open(struct inode* inode, struct file*  file)
@@ -133,7 +133,6 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 //----------------------------------------------------------------
 static long device_ioctl(struct file* file, unsigned int ioctl_command_id, unsigned long ioctl_param )
 {
-    int status;
     printk("Initiating 'device_ioctl'.");
 
     // Switch according to the ioctl called
@@ -188,7 +187,6 @@ static int __init device_init(void)
 //---------------------------------------------------------------
 static void __exit device_cleanup(void)
 {
-    int status;
     printk("Initiating 'device_cleanup'.");
 
     for (int i = 0; i < MINOR_AMOUNT_LIMIT; i++) {

@@ -107,7 +107,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     minor = ((file_p_data*) file -> private_data) -> minor;
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
 
-    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %d\n",
+    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %ld\n",
                                             DEVICE_FILE_NAME, minor, channel_id, length);
     // Check msg length validation
     if (length <= 0 || length > 128) {

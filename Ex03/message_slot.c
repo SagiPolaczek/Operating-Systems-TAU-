@@ -83,7 +83,8 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     // Read msg
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < msg_size; i++) {
-        status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
+        // status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
+        status = get_user(buffer[i], &msg_buffer[i]);
         if (status != SUCCESS) {
             // TODO: raise error
         }

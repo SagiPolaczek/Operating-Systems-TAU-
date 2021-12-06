@@ -136,7 +136,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < length; i++) {
         printk("%s - device_write: char to be written = %c\n", DEVICE_FILE_NAME, buffer[i]);
-        status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
+        status = get_user(msg_buffer[i], &buffer[i]); // maybe need fix
         printk("%s - device_write: written char = %c\n", DEVICE_FILE_NAME, msg_buffer[i]);
         if (status != SUCCESS) {
             // TODO: raise error

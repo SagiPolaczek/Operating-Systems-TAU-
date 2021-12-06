@@ -196,10 +196,6 @@ static void __exit device_cleanup(void)
     unregister_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME);
 }
 
-//---------------------------------------------------------------
-module_init(device_init);
-module_exit(device_cleanup);
-
 
 
 // ========================= ADDITIONAL FUNCTIONS =========================
@@ -241,7 +237,7 @@ int free_sll(channel_node* head_node) {
     if (head_node == NULL) { // if SLL is empty
         return SUCCESS;
     }
-    
+
     // Hold the pointer for the next node, and free the current
     while (curr_node -> next != NULL){
         next_node = curr_node -> next;
@@ -251,5 +247,10 @@ int free_sll(channel_node* head_node) {
 
     return SUCCESS;
 }
+
+
+//---------------------------------------------------------------
+module_init(device_init);
+module_exit(device_cleanup);
 
 //========================= END OF FILE =========================

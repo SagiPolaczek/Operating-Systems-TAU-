@@ -20,11 +20,12 @@ channel_node** ch_slots[MINOR_AMOUNT_LIMIT];
 //================== DEVICE FUNCTIONS ===========================
 static int device_open(struct inode* inode, struct file*  file)
 {
-    int status;
+    file_p_data* file_data;
+
     printk("Initiating 'device_open'.");
 
     file -> private_data = (void*) kmalloc(sizeof(file_p_data), GFP_KERNEL);
-    file_p_data* file_data = (file_p_data*)file -> private_data;
+    file_data = (file_p_data*)file -> private_data;
     if (file_data == NULL) {
         // TODO: raise error
         return FAILURE;
@@ -48,11 +49,15 @@ static int device_release(struct inode* inode, struct file*  file)
 // the device file attempts to read from it
 static ssize_t device_read(struct file* file, char __user* buffer, size_t length, loff_t* offset )
 {
-    int status;
+    int status, minor, msg_size, i;
+    unsigned int channel_id;
+    channel_node* node;
+    char* msg_buffer;
+
     printk("Initiating 'device_read'.");
 
     // get channel id
-    int channel_id = ((file_p_data*) file -> private_data) -> channel_id;
+    channel_id = ((file_p_data*) file -> private_data) -> channel_id;
 
     // Check msg ch id validation   
     if (channel_id == 0) {
@@ -60,22 +65,22 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     }
 
     // get minor
-    int minor = ((file_p_data*) file -> private_data) -> minor;
+    minor = ((file_p_data*) file -> private_data) -> minor;
     
     // find channel node, if exist
-    channel_node* node = find_channel_node(ch_slots, minor, channel_id);
+    node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL)  {
         return -ENOSPC;
     }
 
-    int msg_size = node -> msg_size;
+    msg_size = node -> msg_size;
     if (length < msg_size) {
         return -ENOSPC;
     }
 
     // Read msg
-    char* msg_buffer = node -> msg_buffer;
-    for (int i = 0; i < length; i++) {
+    msg_buffer = node -> msg_buffer;
+    for (i = 0; i < length; i++) {
         status = put_user(msg_buffer[i], buffer[i]); // maybe need fix
         if (status != SUCCESS) {
             // TODO: raise error

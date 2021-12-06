@@ -98,21 +98,22 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     char* msg_buffer;
     channel_node* node;
 
-    printk("%s: Initiating 'device_write'.\n", DEVICE_FILE_NAME);
+    // Get minor from file's private data
+    minor = ((file_p_data*) file -> private_data) -> minor;
+    channel_id = ((file_p_data*) file -> private_data) -> channel_id;
+
+    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u\n", DEVICE_FILE_NAME, minor, channel_id);
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;
     }
 
-    channel_id = ((file_p_data*) file -> private_data) -> channel_id;
+    
     // Check msg ch id validation   
     if (channel_id == 0) {
         return -EINVAL;
     }
 
-    // Get minor from file's private data
-    minor = ((file_p_data*) file -> private_data) -> minor;
-    
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL) {
         node = insert_channel_node(ch_slots, minor, channel_id);

@@ -13,7 +13,7 @@
 int main(int argc, char **argv)
 {
     int status;
-    int total_written;
+    int total_read;
 
     if (argc != 3) {
         perror("reader: invalid number of arguments\n");
@@ -37,14 +37,15 @@ int main(int argc, char **argv)
     }
 
     char buffer[BUFFER_SIZE];
-    total_written = read(fd, buffer, BUFFER_SIZE);
-    printf("reader: total_written = %d\n", total_written);
+    total_read = read(fd, buffer, BUFFER_SIZE);
+    printf("reader: read from msg_slot = %d\n", total_read);
     if (status < SUCCESS) {
         perror("reader: Error has occured while reading the msg\n");
         exit(1);
     }
 
-    status = write(STDOUT_FILENO, buffer, total_written);
+    status = write(STDOUT_FILENO, buffer, total_read);
+    printf("reader: total write to console = %d\n", total_read);
     if (status == FAILURE) {
         perror("reader: Error has occured while printing the msg\n");
         exit(1);

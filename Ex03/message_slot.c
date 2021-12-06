@@ -234,13 +234,15 @@ channel_node* insert_channel_node(channel_node** ch_slots, int minor, int channe
     return node;
 }
 
-// TODO: implement free function
+// Take a head of a channel_nodes SLL and free the allocated memmory 
 int free_sll(channel_node* head_node) {
     channel_node* curr_node = head_node;
     channel_node* next_node;
-    if (head_node == NULL) {
+    if (head_node == NULL) { // if SLL is empty
         return SUCCESS;
     }
+    
+    // Hold the pointer for the next node, and free the current
     while (curr_node -> next != NULL){
         next_node = curr_node -> next;
         kfree(curr_node);

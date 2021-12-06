@@ -112,6 +112,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 
     printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %ld\n",
                                             DEVICE_FILE_NAME, minor, channel_id, length);
+    printk("%s - device_write: msg to be written = %s\n", DEVICE_FILE_NAME, buffer);
+                                      
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;

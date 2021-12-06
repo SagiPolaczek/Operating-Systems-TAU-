@@ -18,8 +18,8 @@ channel_node* ch_slots[MINOR_AMOUNT_LIMIT];
 static int device_open(struct inode* inode, struct file*  file)
 {
     file_p_data* file_data;
-
-    printk("%s: Initiating 'device_open'.\n", DEVICE_FILE_NAME);
+    int minor = iminor(inode);
+    printk("%s: Initiating 'device_open'. minor = %d\n", DEVICE_FILE_NAME, minor);
 
     file -> private_data = (void*) kmalloc(sizeof(file_p_data), GFP_KERNEL);
     file_data = (file_p_data*)file -> private_data;
@@ -28,7 +28,7 @@ static int device_open(struct inode* inode, struct file*  file)
         return FAILURE;
     }
 
-    file_data -> minor = iminor(inode);
+    file_data -> minor = minor;
     file_data -> channel_id = 0;
     return SUCCESS;
 }

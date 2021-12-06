@@ -84,8 +84,8 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
         }
     }
 
-
-    return length;
+    // return the amount that was written 
+    return i;
 }
 
 //---------------------------------------------------------------
@@ -128,8 +128,9 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
         }
     }
 
-    node -> msg_size = length;
-    return length;
+    // save & return the amount that was written 
+    node -> msg_size = i;
+    return i;
 }
 
 //----------------------------------------------------------------

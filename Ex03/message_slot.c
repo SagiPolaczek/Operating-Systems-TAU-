@@ -98,7 +98,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 {
     int status, minor, i;
     unsigned int channel_id;
-    char* msg_buffer
+    char* msg_buffer;
     channel_node* node;
 
     printk("Initiating 'device_write'.");
@@ -171,9 +171,6 @@ static int __init device_init(void)
 {
     int status;
     printk("Initiating 'device_init'.");
-
-    // init dev struct
-    memset( &device_info, 0, sizeof(struct chardev_info) );
 
     // Register driver capabilities. Obtain major num
     status = register_chrdev( MAJOR_NUM, DEVICE_RANGE_NAME, &fops );

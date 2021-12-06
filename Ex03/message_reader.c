@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     int total_written;
 
     if (argc != 3) {
-        //TODO: raise error
+        perror("reader: invalid number of arguments\n");
         exit(1);
     }
 

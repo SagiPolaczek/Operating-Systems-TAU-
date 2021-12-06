@@ -51,33 +51,38 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     channel_node* node;
     char* msg_buffer;
 
-    printk("%s: Initiating 'device_read'.\n", DEVICE_FILE_NAME);
-
-    // get channel id
+    // get minor & channel_id
+    minor = ((file_p_data*) file -> private_data) -> minor;
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
+
+    printk("%s: Initiating 'device_read'. minor = %d, channel_id = %u.\n", 
+                                        DEVICE_FILE_NAME, minor, channel_id);
+
 
     // Check msg ch id validation   
     if (channel_id == 0) {
         return -EINVAL;
     }
 
-    // get minor
-    minor = ((file_p_data*) file -> private_data) -> minor;
+    
     
     // find channel node, if exist
+    printk("%s - device_read: Searching for channel's node...\n", DEVICE_FILE_NAME);
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL)  {
         return -ENOSPC;
     }
 
     msg_size = node -> msg_size;
+    printk("%s - device_read: Channel's node has been found. msg's size = %d\n", DEVICE_FILE_NAME, msg_size);
+
     if (length < msg_size) {
         return -ENOSPC;
     }
 
     // Read msg
     msg_buffer = node -> msg_buffer;
-    for (i = 0; i < length; i++) {
+    for (i = 0; i < msg_size; i++) {
         status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
         if (status != SUCCESS) {
             // TODO: raise error
@@ -102,7 +107,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     minor = ((file_p_data*) file -> private_data) -> minor;
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
 
-    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u\n", DEVICE_FILE_NAME, minor, channel_id);
+    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %d\n",
+                                            DEVICE_FILE_NAME, minor, channel_id, length);
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;
@@ -116,6 +122,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL) {
+        printk("device_write: Inserting new node. minor = %d, channel_id = %d.\n",
+                                                                minor, channel_id);
         node = insert_channel_node(ch_slots, minor, channel_id);
     }
 

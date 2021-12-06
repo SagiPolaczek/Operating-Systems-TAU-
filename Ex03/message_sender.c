@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     int status;
 
     if (argc != 4) {
-        // TODO: raise error.
+        perror("sender: invalid number of arguments\n");
     }
 
     // parsing arguments

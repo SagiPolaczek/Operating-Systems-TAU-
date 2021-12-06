@@ -84,9 +84,9 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < msg_size; i++) {
         // status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
+        printk("%s - device_read: char to be written = %c\n", DEVICE_FILE_NAME, msg_buffer[i]);
         status = get_user(buffer[i], &msg_buffer[i]);
-        printk("%s - device_read: char to be written = %c, written char = %c\n", 
-                                    DEVICE_FILE_NAME, buffer[i], msg_buffer[i]);
+        printk("%s - device_read: written char = %c\n", DEVICE_FILE_NAME, buffer[i]);
         if (status != SUCCESS) {
             // TODO: raise error
         }
@@ -113,7 +113,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %ld\n",
                                             DEVICE_FILE_NAME, minor, channel_id, length);
     printk("%s - device_write: msg to be written = %s\n", DEVICE_FILE_NAME, buffer);
-                                      
+
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;
@@ -135,9 +135,9 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     // Write msg
     msg_buffer = node -> msg_buffer;
     for (i = 0; i < length; i++) {
+        printk("%s - device_write: char to be written = %c\n", DEVICE_FILE_NAME, buffer[i]);
         status = put_user(buffer[i], &msg_buffer[i]); // maybe need fix
-        printk("%s - device_write: char to be written = %c, written char = %c\n", 
-                                                DEVICE_FILE_NAME, msg_buffer[i], buffer[i]);
+        printk("%s - device_write: written char = %c\n", DEVICE_FILE_NAME, msg_buffer[i]);
         if (status != SUCCESS) {
             // TODO: raise error
         }

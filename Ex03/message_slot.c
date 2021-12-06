@@ -96,30 +96,34 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
 // the device file attempts to write to it
 static ssize_t device_write(struct file* file, const char __user* buffer, size_t length, loff_t* offset)
 {
-    int status;
+    int status, minor, i;
+    unsigned int channel_id;
+    char* msg_buffer
+    channel_node* node;
+
     printk("Initiating 'device_write'.");
     // Check msg length validation
     if (length <= 0 || length > 128) {
         return -EMSGSIZE;
     }
 
-    int channel_id = ((file_p_data*) file -> private_data) -> channel_id;
+    channel_id = ((file_p_data*) file -> private_data) -> channel_id;
     // Check msg ch id validation   
     if (channel_id == 0) {
         return -EINVAL;
     }
 
     // Get minor from file's private data
-    int minor = ((file_p_data*) file -> private_data) -> minor;
+    minor = ((file_p_data*) file -> private_data) -> minor;
     
-    channel_node* node = find_channel_node(ch_slots, minor, channel_id);
+    node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL) {
         node = insert_channel_node(ch_slots, minor, channel_id);
     }
 
     // Write msg
-    char* msg_buffer = node -> msg_buffer;
-    for (int i = 0; i < length; i++) {
+    msg_buffer = node -> msg_buffer;
+    for (i = 0; i < length; i++) {
         status = put_user(buffer[i], msg_buffer[i]); // maybe need fix
         if (status != SUCCESS) {
             // TODO: raise error

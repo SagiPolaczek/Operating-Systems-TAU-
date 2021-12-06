@@ -85,7 +85,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     for (i = 0; i < msg_size; i++) {
         // status = put_user(msg_buffer[i], &buffer[i]); // maybe need fix
         printk("%s - device_read: char to be written = %c\n", DEVICE_FILE_NAME, msg_buffer[i]);
-        status = put_user(msg_buffer, &buffer[i]);
+        status = put_user(msg_buffer[i], &buffer[i]);
         printk("%s - device_read: written char = %c\n", DEVICE_FILE_NAME, buffer[i]);
         if (status != SUCCESS) {
             // TODO: raise error

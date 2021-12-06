@@ -19,7 +19,7 @@ static int device_open(struct inode* inode, struct file*  file)
 {
     file_p_data* file_data;
 
-    printk("Initiating 'device_open'.");
+    printk("%s: Initiating 'device_open'.", DEVICE_FILE_NAME);
 
     file -> private_data = (void*) kmalloc(sizeof(file_p_data), GFP_KERNEL);
     file_data = (file_p_data*)file -> private_data;
@@ -167,7 +167,7 @@ struct file_operations fops =
 static int __init device_init(void)
 {
     int status;
-    printk("Initiating 'device_init'.");
+    printk("%s: Initiating 'device_init'.", DEVICE_FILE_NAME);
 
     // Register driver capabilities. Obtain major num
     status = register_chrdev( MAJOR_NUM, DEVICE_RANGE_NAME, &fops );
@@ -186,7 +186,7 @@ static int __init device_init(void)
 static void __exit device_cleanup(void)
 {
     int i;
-    printk("Initiating 'device_cleanup'.");
+    printk("%s: Initiating 'device_cleanup'.", DEVICE_FILE_NAME);
 
     for (i = 0; i < MINOR_AMOUNT_LIMIT; i++) {
         free_sll(ch_slots[i]);

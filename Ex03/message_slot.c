@@ -185,9 +185,10 @@ static int __init device_init(void)
 //---------------------------------------------------------------
 static void __exit device_cleanup(void)
 {
+    int i;
     printk("Initiating 'device_cleanup'.");
 
-    for (int i = 0; i < MINOR_AMOUNT_LIMIT; i++) {
+    for (i = 0; i < MINOR_AMOUNT_LIMIT; i++) {
         free_sll(ch_slots[i]);
     }
     // Unregister the device

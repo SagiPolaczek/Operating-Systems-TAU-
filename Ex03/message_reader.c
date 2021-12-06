@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     }
 
     status = write(1, buffer, total_read);
-    printf("reader - printf printing msg: %s\n", buffer);
+    printf("reader - printf printing msg: %s.\n", buffer);
     printf("reader: total write to console = %d\n", status);
     if (status == FAILURE) {
         perror("reader: Error has occured while printing the msg\n");

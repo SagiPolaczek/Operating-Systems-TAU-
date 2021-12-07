@@ -75,6 +75,9 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
 
     msg_size = node -> msg_size;
     printk("%s - device_read: Channel's node has been found. msg's size = %d\n", DEVICE_FILE_NAME, msg_size);
+    if (msg_size == 0) {
+        return -EWOULDBLOCK;
+    }
 
     if (length < msg_size) {
         return -ENOSPC;
@@ -244,6 +247,7 @@ channel_node* insert_channel_node(channel_node** ch_slots, int minor, int channe
     node -> minor = minor;
     node -> channel_id = channel_id;
     node -> next = ch_slots[minor];
+    node -> msg_size = 0;
     ch_slots[minor] = node;
 
     return node;

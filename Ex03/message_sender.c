@@ -39,8 +39,8 @@ int main(int argc, char **argv)
     }
 
     // Write
-    printf("sender: Writing msg. slot_path = %s, channel_id = %d, msg's length = %d.\n",
-                                        msg_slot_file_path, target_msg_channel_id, length);
+    /* printf("sender: Writing msg. slot_path = %s, channel_id = %d, msg's length = %d.\n",
+                                        msg_slot_file_path, target_msg_channel_id, length); */
     status = write(fd, msg, length);
     if (status != length) {
         perror("sender: Error has occured while writing the msg\n");

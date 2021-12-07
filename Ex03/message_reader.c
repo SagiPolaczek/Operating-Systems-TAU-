@@ -38,15 +38,15 @@ int main(int argc, char **argv)
 
     char buffer[BUFFER_SIZE];
     total_read = read(fd, buffer, BUFFER_SIZE);
-    printf("reader: read from msg_slot = %d\n", total_read);
+    /* printf("reader: read from msg_slot = %d\n", total_read); */ 
     if (status < SUCCESS) {
         perror("reader: Error has occured while reading the msg\n");
         exit(1);
     }
 
     status = write(1, buffer, total_read);
-    printf("reader - printf printing msg: %s.\n", buffer);
-    printf("reader: total write to console = %d\n", status);
+    /* printf("reader - printf printing msg: %s.\n", buffer); */
+    /* printf("reader: total write to console = %d\n", status); */
     if (status == FAILURE) {
         perror("reader: Error has occured while printing the msg\n");
         exit(1);

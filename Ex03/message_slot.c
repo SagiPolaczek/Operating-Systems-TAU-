@@ -70,7 +70,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     printk("%s - device_read: Searching for channel's node...\n", DEVICE_FILE_NAME);
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL)  {
-        return -ENOSPC;
+        return -EWOULDBLOCK;
     }
 
     msg_size = node -> msg_size;

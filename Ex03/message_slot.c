@@ -59,8 +59,8 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
                                         DEVICE_FILE_NAME, minor, channel_id);
 
 
-    // Check msg ch id validation   
-    if (channel_id == 0) {
+    // Check msg ch id, and buffer validation  
+    if (channel_id == 0 || buffer == NULL) {
         return -EINVAL;
     }
 

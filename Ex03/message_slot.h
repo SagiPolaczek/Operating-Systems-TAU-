@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _MY_MSG_SLUT_
+#define _MY_MSG_SLUT_
 
 #undef __KERNEL__
 #define __KERNEL__
@@ -31,3 +32,5 @@ typedef struct file_p_data {
 channel_node* find_channel_node(channel_node** ch_slots, int minor, int channel_id);
 channel_node* insert_channel_node(channel_node** ch_slots, int minor, int channel_id);
 int free_sll(channel_node* head_node);
+
+#endif

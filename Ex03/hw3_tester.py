@@ -58,6 +58,7 @@ def read_message(device_path_Name, chID, is_user_file=True):
         else:
             p = sp.run(args=['./message_reader_true', device_path_Name, str(chID)], capture_output=True, text=True)
     except sp.SubprocessError as e:
+        print("In here")
         raise sp.SubprocessError
 
     return p.stdout
@@ -130,9 +131,12 @@ def run_tests(device_path_name, minor_num):
             continue
         print("in test 2")
         try:
+            print("Hey")
             user_output = read_message(device_path_name, test_args['ch_id'], True)
         except sp.SubprocessError as e:
+            print("Hey I am here")
             points_to_reduct += POINTS_REDUCTION_BUG
+            print("42")
             test_errors_str += "message_reader failed. "
             continue
         print("in test 3")

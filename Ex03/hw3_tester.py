@@ -54,8 +54,10 @@ def compile_student_files():
 def read_message(device_path_Name, chID, is_user_file=True):
     try:
         if is_user_file:
+            print("Hey2")
             p = sp.run(args=['./message_reader', device_path_Name, str(chID)], capture_output=True, text=True)
         else:
+            print("Hey3")
             p = sp.run(args=['./message_reader_true', device_path_Name, str(chID)], capture_output=True, text=True)
     except sp.SubprocessError as e:
         print("In here")

@@ -17,8 +17,8 @@
 
 typedef struct channel_node {
     int minor;
-    int channel_id; // key
-    char msg_buffer[BUFFER_SIZE]; // ????
+    int channel_id; 
+    char msg_buffer[BUFFER_SIZE]; 
     int msg_size;
     struct channel_node* next;
 } channel_node;

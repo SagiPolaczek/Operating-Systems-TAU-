@@ -1,3 +1,9 @@
+// NOTES:
+// * Some of the code was copied from the recitation
+// * DEBUGGING MSGS ARE IN COMMENTS
+
+// ENJOY
+
 #include "message_slot.h"
 
 #include <linux/kernel.h>   /* We're doing kernel work */
@@ -19,13 +25,13 @@ static int device_open(struct inode* inode, struct file*  file)
 {
     file_p_data* file_data;
     int minor = iminor(inode);
-    printk("%s: Initiating 'device_open'. minor = %d\n", DEVICE_FILE_NAME, minor);
+    /* printk("%s: Initiating 'device_open'. minor = %d\n", DEVICE_FILE_NAME, minor); */
 
     file -> private_data = (void*) kmalloc(sizeof(file_p_data), GFP_KERNEL);
     file_data = (file_p_data*)file -> private_data;
     if (file_data == NULL) {
-        // TODO: raise error
-        return FAILURE;
+        // ERROR OCCURED
+        return -EINVAL;
     }
 
     file_data -> minor = minor;
@@ -36,14 +42,12 @@ static int device_open(struct inode* inode, struct file*  file)
 //---------------------------------------------------------------
 static int device_release(struct inode* inode, struct file*  file)
 {
-    printk("%s: Initiating 'device_open'.\n", DEVICE_FILE_NAME);
+    /* printk("%s: Initiating 'device_open'.\n", DEVICE_FILE_NAME); */
     kfree(file -> private_data);
     return SUCCESS;
 }
 
 //---------------------------------------------------------------
-// a process which has already opened
-// the device file attempts to read from it
 static ssize_t device_read(struct file* file, char __user* buffer, size_t length, loff_t* offset )
 {
     int status, minor, msg_size, i;
@@ -55,26 +59,24 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
     minor = ((file_p_data*) file -> private_data) -> minor;
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
 
-    printk("%s: Initiating 'device_read'. minor = %d, channel_id = %u.\n", 
-                                        DEVICE_FILE_NAME, minor, channel_id);
+    /* printk("%s: Initiating 'device_read'. minor = %d, channel_id = %u.\n", 
+                                        DEVICE_FILE_NAME, minor, channel_id); */
 
 
     // Check msg ch id, and buffer validation  
     if (channel_id == 0 || buffer == NULL) {
         return -EINVAL;
     }
-
-    
     
     // find channel node, if exist
-    printk("%s - device_read: Searching for channel's node...\n", DEVICE_FILE_NAME);
+    /* printk("%s - device_read: Searching for channel's node...\n", DEVICE_FILE_NAME); */
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL)  {
         return -EWOULDBLOCK;
     }
 
     msg_size = node -> msg_size;
-    printk("%s - device_read: Channel's node has been found. msg's size = %d\n", DEVICE_FILE_NAME, msg_size);
+    /* printk("%s - device_read: Channel's node has been found. msg's size = %d\n", DEVICE_FILE_NAME, msg_size); */
     if (msg_size == 0) {
         return -EWOULDBLOCK;
     }
@@ -91,7 +93,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
         status = put_user(msg_buffer[i], &buffer[i]);
         /* printk("%s - device_read: written char = %c\n", DEVICE_FILE_NAME, buffer[i]); */
         if (status != SUCCESS) {
-            // TODO: raise error
+            return -EINVAL;
         }
     }
 
@@ -100,8 +102,6 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
 }
 
 //---------------------------------------------------------------
-// a processs which has already opened
-// the device file attempts to write to it
 static ssize_t device_write(struct file* file, const char __user* buffer, size_t length, loff_t* offset)
 {
     int status, minor, i;
@@ -113,12 +113,12 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
     minor = ((file_p_data*) file -> private_data) -> minor;
     channel_id = ((file_p_data*) file -> private_data) -> channel_id;
 
-    printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %ld\n",
-                                            DEVICE_FILE_NAME, minor, channel_id, length);
+    /* printk("%s: Initiating 'device_write'. minor = %d, channel_id = %u, length = %ld\n",
+                                            DEVICE_FILE_NAME, minor, channel_id, length); */
     if (buffer == NULL) {
         return -EINVAL;
     }
-    printk("%s - device_write: msg to be written = %s\n", DEVICE_FILE_NAME, buffer);
+    /* printk("%s - device_write: msg to be written = %s\n", DEVICE_FILE_NAME, buffer); */
 
     // Check msg length validation
     if (length <= 0 || length > 128) {
@@ -133,8 +133,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 
     node = find_channel_node(ch_slots, minor, channel_id);
     if (node == NULL) {
-        printk("device_write: Inserting new node. minor = %d, channel_id = %d.\n",
-                                                                minor, channel_id);
+        /* printk("device_write: Inserting new node. minor = %d, channel_id = %d.\n",
+                                                                minor, channel_id); */
         node = insert_channel_node(ch_slots, minor, channel_id);
     }
 
@@ -145,7 +145,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
         status = get_user(msg_buffer[i], &buffer[i]); // maybe need fix
         /* printk("%s - device_write: written char = %c\n", DEVICE_FILE_NAME, msg_buffer[i]); */
         if (status != SUCCESS) {
-            // TODO: raise error
+            return -EINVAL;
         }
     }
 
@@ -157,7 +157,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 //----------------------------------------------------------------
 static long device_ioctl(struct file* file, unsigned int ioctl_command_id, unsigned long ioctl_param )
 {
-    printk("%s: Initiating 'device_ioctl'.\n", DEVICE_FILE_NAME);
+    /* printk("%s: Initiating 'device_ioctl'.\n", DEVICE_FILE_NAME); */
 
     // Switch according to the ioctl called
     if( ioctl_command_id == MSG_SLOT_CHANNEL && ioctl_param != 0) {
@@ -190,19 +190,19 @@ struct file_operations fops =
 static int __init device_init(void)
 {
     int status;
-    printk("%s: Initiating 'device_init'.\n", DEVICE_FILE_NAME);
+    /* printk("%s: Initiating 'device_init'.\n", DEVICE_FILE_NAME); */
 
     // Register driver capabilities. Obtain major num
     status = register_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME, &fops );
 
     // Negative values signify an error
     if ( status <= FAILURE ) {
-    printk(KERN_ERR "%s registraion failed for  %d\n",
-                        DEVICE_FILE_NAME, MAJOR_NUM );
+    /* printk(KERN_ERR "%s registraion failed for  %d\n",
+                        DEVICE_FILE_NAME, MAJOR_NUM ); */
     return FAILURE;
     }
 
-    printk("%s: Done - 'device_init'.\n", DEVICE_FILE_NAME);
+    /* rintk("%s: Done - 'device_init'.\n", DEVICE_FILE_NAME); */
     return SUCCESS;
 }
 
@@ -210,7 +210,7 @@ static int __init device_init(void)
 static void __exit device_cleanup(void)
 {
     int i;
-    printk("%s: Initiating 'device_cleanup'.\n", DEVICE_FILE_NAME);
+    /* printk("%s: Initiating 'device_cleanup'.\n", DEVICE_FILE_NAME); */
 
     for (i = 0; i < MINOR_AMOUNT_LIMIT; i++) {
         free_sll(ch_slots[i]);
@@ -218,7 +218,7 @@ static void __exit device_cleanup(void)
     // Unregister the device
     // Should always succeed
     unregister_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME);
-    printk("%s: Done - 'device_cleanup'.\n", DEVICE_FILE_NAME);
+    /* printk("%s: Done - 'device_cleanup'.\n", DEVICE_FILE_NAME); */
 }
 
 

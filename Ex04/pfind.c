@@ -53,11 +53,11 @@ FLOW:
     b) all searching threads have died due to an error.
 
 */
-int main(int argc, char* argv)
+int main(int argc, char **argv)
 {
     // Declerations
     int num_threads;
-    dir_queue queue;
+    dir_queue *queue;
     pthread_t *threads_arr;
 
     // Validating input:
@@ -72,8 +72,11 @@ int main(int argc, char* argv)
 
 
     
-    // Create a FIFO queue
+    // 1. Create a FIFO queue
+    queue = create_dir_queue();
 
+    // 2. Put the search root directory in the queue
+    
 
 
 
@@ -98,12 +101,20 @@ int is_empty(dir_queue *queue)
 
 dir_queue *create_dir_queue()
 {
-    // TODO: implement
+    dir_queue *queue = (dir_queue*)malloc(sizeof(dir_queue));
+    if (queue == NULL) {
+        // TODO: drop error
+    }
+    queue -> head = NULL;
+    queue -> tail = NULL;
+    queue -> size = 0;
+    return queue;
 }
 
 dir_node *create_dir_node()
 {
     // TODO: implement
+    return NULL;
 }
 
 void free_dir_queue(dir_queue *queue)

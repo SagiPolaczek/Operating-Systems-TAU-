@@ -2,12 +2,10 @@
 #include <stdatomic.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define SUCCESS 0
 #define FAILURE 1
-
-
-// Function's declarations 
 
 // Structs:
 typedef struct dir_node {
@@ -33,6 +31,13 @@ typedef struct thread_queue {
 } thread_queue;
 
 
+// Function's declarations 
+int is_empty(dir_queue *queue);
+dir_queue *create_dir_queue();
+dir_node *create_dir_node();
+void free_dir_queue(dir_queue *queue);
+
+
 /*
 argv[1] = search root directory
 argv[2] = search term
@@ -53,6 +58,7 @@ int main(int argc, char* argv)
     // Declerations
     int num_threads;
     dir_queue queue;
+    pthread_t *threads_arr;
 
     // Validating input:
     if (argc != 4) {
@@ -61,12 +67,13 @@ int main(int argc, char* argv)
     // TODO: Check the validation of search's path
 
     num_threads = atoi(argv[3]);
-    pthread_t *threads_arr = (pthread_t*)calloc(num_threads, sizeof(pthread_t));
+    threads_arr = (pthread_t*)calloc(num_threads, sizeof(pthread_t)); //TODO: FREE !
     // TODO: Check valid
 
-    
+
     
     // Create a FIFO queue
+
 
 
 
@@ -89,12 +96,12 @@ int is_empty(dir_queue *queue)
     return (queue -> size == 0);
 }
 
-dir_queue create_dir_queue()
+dir_queue *create_dir_queue()
 {
     // TODO: implement
 }
 
-dir_node create_dir_node()
+dir_node *create_dir_node()
 {
     // TODO: implement
 }

@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 {
     // Declerations
     char *search_path;
-    int i, status, thread_status;
+    int i, status/*, thread_status*/;
     dir_node *node;
     pthread_t *threads;
 
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 
     // --- 2. Put the search root directory in the queue -------
     node = create_dir_node(search_term);
-    add_to_queue(queue, node);
+    add(queue, node);
 
     // --- 3. Create threads -------
     // Create diff CV for each thread
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     pthread_mutex_init(&start_mutex, NULL);
     printf("Start Launching Threads.\n");
     for (i = 0; i < num_threads; ++i) {
-        printf("Main: creating thread %ld\n", i);
+        printf("Main: creating thread %d\n", i);
         pthread_cond_init(&threads_cvs[i], NULL);
         status = pthread_create(&threads[i], NULL, thread_routine, (void *)i);
         if (status != SUCCESS) {

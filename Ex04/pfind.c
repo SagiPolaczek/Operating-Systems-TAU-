@@ -31,7 +31,7 @@ typedef struct thread_queue {
     int busy;
 } thread_queue;
 
-typedef struct stat stat;
+typedef struct stat stats;
 typedef struct dirent dirent;
 
 // Function's declarations 
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     pthread_mutex_init(&start_mutex, NULL);
     printf("Start Launching Threads.\n");
     for (i = 0; i < num_threads; ++i) {
-        printf("Main: creating thread %ld\n", t);
+        printf("Main: creating thread %ld\n", i);
         pthread_cond_init(&threads_cvs[i], NULL);
         status = pthread_create(&threads[i], NULL, thread_routine, (void *)i);
         if (status != SUCCESS) {
@@ -171,7 +171,7 @@ int search_dir(char *dir_path)
 {
     dirent *entry;
     char *entry_name;
-    stat entry_stats;
+    stats entry_stats;
     dir_node *entry_node;
     char entry_path[PATH_MAX];
     DIR *dir = opendir(dir_path);

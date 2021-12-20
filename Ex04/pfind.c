@@ -39,7 +39,7 @@ int is_empty(dir_queue *queue);
 dir_queue *create_dir_queue();
 dir_node *create_dir_node();
 void free_dir_queue(dir_queue *queue);
-void add(dir_queue queue, dir_node node);
+void add(dir_queue *queue, dir_node *node);
 int pop_path(dir_queue queue, char* path);
 void dummy_func();
 
@@ -261,7 +261,7 @@ dir_node *create_dir_node(char *path)
     Add the node into the queue.
     Should always succeed.
 */
-void add(dir_queue queue, dir_node node)
+void add(dir_queue *queue, dir_node *node)
 {
     node -> next = queue -> head;
     queue -> head = node;

@@ -56,6 +56,7 @@ dir_queue *queue;
 
 pthread_mutex_t start_mutex;
 pthread_mutex_t matched_mutex;
+pthread_mutex_t queue_mutex;
 
 pthread_cond_t ready_cv;
 pthread_cond_t *threads_cvs;
@@ -123,9 +124,10 @@ int main(int argc, char **argv)
 
     // Init mutexes
     // pthread_mutex_init(&matched_mutex, NULL); // TODO: delete???
+    pthread_mutex_init(&queue_mutex, NULL);
 
     // 4. Signal all threads to start searching
-    
+
 
 }
 
@@ -170,6 +172,7 @@ int search_dir(char *dir_path)
     dirent *entry;
     char *entry_name;
     stat entry_stats;
+    dir_node *entry_node;
     char entry_path[PATH_MAX];
     DIR *dir = opendir(dir_path);
     if (dir == NULL) {
@@ -188,7 +191,11 @@ int search_dir(char *dir_path)
 
         // If the entry is a directory
         if (S_ISDIR(entry_stats.st_mode)) {
-
+            // Creating a node for the entry and adding it to the queue
+            entry_node = create_dir_node(entry_path);
+            pthread_mutex_lock(&queue_mutex);
+            add(queue, entry_node);
+            pthread_mutex_unlock(&queue_mutex);
         }
 
         // If the entry is a file
@@ -211,7 +218,7 @@ int search_dir(char *dir_path)
 }
 
 
-// ----- Directory's Queue & Node Functionallity -----
+// --- Directory's Queue & Node Functionallity ------
 
 /*
     return 1 if queue is empty, else 0
@@ -226,7 +233,7 @@ int is_empty(dir_queue *queue)
 */
 dir_queue *create_dir_queue()
 {
-    dir_queue *queue = (dir_queue*)malloc(sizeof(dir_queue));
+    queue = (dir_queue*)malloc(sizeof(dir_queue));
     if (queue == NULL) {
         // TODO: drop error
     }

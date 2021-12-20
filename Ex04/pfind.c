@@ -41,6 +41,7 @@ dir_node *create_dir_node();
 void free_dir_queue(dir_queue *queue);
 void add(dir_queue *queue, dir_node *node);
 int pop_path(dir_queue queue, char* path);
+void *thread_routine(void *i);
 void dummy_func();
 
 

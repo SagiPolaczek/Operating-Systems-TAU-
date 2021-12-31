@@ -45,6 +45,7 @@ int main(int argc, char** argv)
     char* buff;
     sockaddr_in serv_addr;
     int scanned;
+    char *path;
 
     if (argc != 4) {
         perror("Error! Invalid amount of argumnets. should be 3.");
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
 
     // --- Stage 1 ------
     port = atoi(argv[2]);
+    path = argv[3];
     file = fopen(argv[3], "rb");
     if (file == NULL) {
         perror("Error! Could not load file successfully.");
@@ -102,7 +104,7 @@ int main(int argc, char** argv)
     while (not_written > 0) {
         nsent = write(sockfd, buff_N + total_sent, not_written);
         if (nsent < 0) {
-            perror("Error! Could not write to socket successfully.");
+            perror("Error! Could not write to socket (1) successfully.");
             exit(1);
         }
         total_sent += nsent;
@@ -114,7 +116,7 @@ int main(int argc, char** argv)
     while (not_written > 0) {
         nsent = write(sockfd, buff + total_sent, not_written);
         if (nsent < 0) {
-            perror("Error! Could not write to socket successfully.");
+            perror("Error! Could not write to socket (2) successfully.");
             exit(1);
         }
     }
@@ -152,13 +154,13 @@ int get_file_size(FILE* fd)
 
     status = fseek(fd, 0L, SEEK_END);
     if (status != SUCCESS) {
-        perror("Error! Could not get file size successfully.");
+        perror("Error! Could not get file size (1) successfully.");
         exit(1);
     }
     sz = ftell(fd);
     fseek(fd, 0L, SEEK_SET);
     if (status != SUCCESS) {
-        perror("Error! Could not get file size successfully.");
+        perror("Error! Could not get file size (2) successfully.");
         exit(1);
     }
 

@@ -181,7 +181,7 @@ int is_printable(char c)
 */
 int init_sigint_handler()
 {
-    struct sigaction signal = {0};
+    struct sigaction signal = {{0}};
     signal.sa_handler =&my_sigint_handler;
     signal.sa_flags = SA_RESTART;
     return sigaction(SIGINT, &signal, 0);

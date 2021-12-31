@@ -112,7 +112,7 @@ int main(int argc, char** argv)
             exit(1);
         }
         total_sent += nsent;
-        not_written += nsent;
+        not_written -= nsent;
     }
 
     total_sent = 0;

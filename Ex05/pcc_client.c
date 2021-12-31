@@ -33,15 +33,14 @@ int main(int argc, char** argv)
 {
     FILE *file;
     int N, i;
-    uint32_t N_read;
     uint32_t C;
     uint32_t serv_N;
     char *buff_N;
     int nsent, nread;
     int total_sent = -1;
     int total_read = -1;
-    int not_written, not_read;
     int sockfd = -1;
+    int not_written, not_read;
     int port, status;
     char* buff;
     sockaddr_in serv_addr;
@@ -62,9 +61,7 @@ int main(int argc, char** argv)
         perror("Error! Could not load file successfully.");
         exit(1);
     }
-
     N = get_file_size(file);
-
 
     // --- Stage 2 ------
     sockfd = socket(AF_INET, SOCK_STREAM, 0);

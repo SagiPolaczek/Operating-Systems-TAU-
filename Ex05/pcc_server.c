@@ -71,7 +71,8 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    status = listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    status = listenfd;
     if (status < SUCCESS) {
         perror("Error! Could not create socket successfully.");
         exit(1);

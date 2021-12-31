@@ -244,7 +244,7 @@ int main(int argc, char** argv)
 */
 int is_printable(char c)
 {
-    return (32 <= (int)c) & ((int)c <= 126);
+    return (32 <= (int)c) && ((int)c <= 126);
 }
 
 /*

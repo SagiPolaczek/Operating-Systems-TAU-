@@ -61,8 +61,7 @@ int main(int argc, char** argv)
         exit(1);
     }
     N = get_file_size(file);
-    //debug
-    printf("N from client is:%u\n", N);
+
     // --- Stage 2 ------
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {

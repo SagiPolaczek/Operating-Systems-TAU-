@@ -10,7 +10,6 @@
 #include <signal.h>
 
 #define SUCCESS 0
-#define _DEFAULT_SOURCE
 
 int get_file_size(FILE* fd);
 

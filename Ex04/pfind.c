@@ -18,6 +18,7 @@ typedef struct dir_node {
 
 typedef struct dir_queue {
     dir_node *head;
+    dir_node *tail;
     int size;
 } dir_queue;
 
@@ -80,7 +81,7 @@ FLOW:
 int main(int argc, char **argv)
 {
     // Declerations
-    char *search_path;
+    //char *search_path;
     int i, status/*, thread_status*/;
     dir_node *node;
     pthread_t *threads;

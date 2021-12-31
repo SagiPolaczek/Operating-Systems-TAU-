@@ -46,6 +46,7 @@ int main(int argc, char** argv)
     sockaddr_in serv_addr;
     int scanned;
     char *path;
+    int i_debbug;
 
     if (argc != 4) {
         perror("Error! Invalid amount of argumnets. should be 3.");
@@ -101,7 +102,9 @@ int main(int argc, char** argv)
     buff_N = (char*)&serv_N;
     not_written = 4;
     total_sent = 0;
+    i_debbug = 0;
     while (not_written > 0) {
+        i_debbug++;
         nsent = write(sockfd, buff_N + total_sent, not_written);
         if (nsent < 0) {
             perror("Error! Could not write to socket (1) successfully.");

@@ -108,7 +108,7 @@ int main(int argc, char** argv)
         total_sent += nsent;
         not_written -= nsent;
     }
-
+    sleep(10);
     total_sent = 0;
     not_written = N;
     while (not_written > 0) {

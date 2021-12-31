@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     // --- Stage 1 ------
     port = atoi(argv[2]);
     path = argv[3];
-    file = fopen(argv[3], "rb");
+    file = fopen(path, "rb");
     if (file == NULL) {
         perror("Error! Could not load file successfully.");
         exit(1);

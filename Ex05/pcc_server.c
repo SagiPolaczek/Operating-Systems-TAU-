@@ -25,6 +25,7 @@ void my_sigint_handler();
 void shutdown_srv();
 
 int connfd = -1;
+int error_flag = 0;
 int sigint_flag = 0;
 counts count = {0};
 
@@ -57,6 +58,7 @@ int main(int argc, char** argv)
     uint32_t serv_N, serv_count;
     char *serv_count_p;
     int not_read, not_written;
+    
 
     if (argc != 2){
         perror("Error! Invalid amount of argumnets. should be 1.");
@@ -106,23 +108,50 @@ int main(int argc, char** argv)
             shutdown_srv();
         }
 
-        status = connfd = accept(listenfd, NULL, NULL);
+        connfd = accept(listenfd, NULL, NULL);
+        status = connfd;
         if(status < SUCCESS) {
             perror("Error! Could not accept connection successfully.");
             exit(1);
         }
 
+        // Making a 32bit uint an 4-Byte char array
         buff_N = (char *)&serv_N;
         total_read = 0;
-        not_read = 4;
+        not_read = 4; // Need to read 4 bytes (32 bit)
         while (not_read > 0) {
             nread = read(connfd, buff_N + total_read, not_read);
             total_read += nread;
             not_read -= nread;
+
+            // Handling errors
+            if (nread == 0 && not_read != 0) { // Verify its not an EOF case
+                perror("Error! Could not read N successfully. (1)");
+                close(connfd);
+                error_flag = 1;
+            }
+            if (nread < 0) {
+                // If one of the mentioned erros
+                if (errno == ETIMEDOUT || errno == ECONNRESET || errno == EPIPE) {
+                    perror("Error! Could not read N successfully. (2)");
+                    close(connfd);
+                    connfd = -1;
+                    error_flag = 1;
+                } else {
+                    perror("Error! Could not read N successfully. FATAL. (3)");
+                    exit(1);
+                }
+            }
         }
-        //TODO: take care ERRORS! 
+        if (error_flag == 1) {
+            error_flag = 0;
+            continue;
+        }
 
         N = ntohl(serv_N);
+        //debug
+        printf("N from server is:%u\n", N);
+
         buff = (char *) malloc(N);
         if (buff == NULL) {
             perror("Error! Could not malloc successfully.");
@@ -135,8 +164,26 @@ int main(int argc, char** argv)
             nread = read(connfd, buff + total_read, not_read);
             total_read += nread;
             not_read -= nread;
+
+            // Handling errors
+            if (nread == 0 && not_read != 0) { // Verify its not an EOF case
+                perror("Error! Could not read N successfully. (4)");
+                close(connfd);
+                error_flag = 1;
+            }
+            if (nread < 0) {
+                // If one of the mentioned erros
+                if (errno == ETIMEDOUT || errno == ECONNRESET || errno == EPIPE) {
+                    perror("Error! Could not read N successfully. (5)");
+                    close(connfd);
+                    connfd = -1;
+                    error_flag = 1;
+                } else {
+                    perror("Error! Could not read N successfully. FATAL. 63)");
+                    exit(1);
+                }
+            }
         }
-        //TODO: take care ERRORS!
 
         // Process data received
         for (i = 0; i < N; i++) {
@@ -144,18 +191,35 @@ int main(int argc, char** argv)
                 count.total += 1;
             }
         }
-
+        
         serv_count = htonl(count.total);
         serv_count_p = (char*)&serv_count;
         total_sent = 0;
         not_written = 4;
         while (not_written > 0) {
             nsent = write(connfd, serv_count_p + total_sent, not_written);
-            if (nsent < 0) {
-                //TODO: ERROR
-            }
             total_sent += nsent;
             not_written -= nsent;
+
+            // Handling errors
+            if (nsent == 0 && not_written != 0) { // Verify its not an EOF case
+                perror("Error! Could not write N successfully. (1)");
+                close(connfd);
+                error_flag = 1;
+            }
+            if (nsent < 0) {
+                // If one of the mentioned erros
+                if (errno == ETIMEDOUT || errno == ECONNRESET || errno == EPIPE) {
+                    perror("Error! Could not write N successfully. (2)");
+                    close(connfd);
+                    connfd = -1;
+                    error_flag = 1;
+                } else {
+                    perror("Error! Could not write N successfully. FATAL. (3)");
+                    exit(1);
+                }
+            }
+
         }
 
         for (i = 0; i < N; i++) {

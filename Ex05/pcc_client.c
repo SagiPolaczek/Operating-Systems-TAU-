@@ -32,8 +32,8 @@ FLOW:
 int main(int argc, char** argv)
 {
     FILE *file;
-    int N, i;
-    uint32_t C;
+    int i;
+    uint32_t N, C;
     uint32_t serv_N;
     char *buff_N;
     int nsent, nread;
@@ -62,7 +62,8 @@ int main(int argc, char** argv)
         exit(1);
     }
     N = get_file_size(file);
-
+    //debug
+    printf("N from client is:%u\n", N);
     // --- Stage 2 ------
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {

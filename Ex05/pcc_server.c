@@ -26,7 +26,7 @@ void shutdown_srv();
 
 int connfd = -1;
 int sigint_flag = 0;
-counts count = {{0}};
+counts count = {0};
 
 /*
 Arguments:

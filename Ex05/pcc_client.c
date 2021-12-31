@@ -105,6 +105,7 @@ int main(int argc, char** argv)
     i_debbug = 0;
     while (not_written > 0) {
         i_debbug++;
+        printf("i_debbug = %d\n", i_debbug);
         nsent = write(sockfd, buff_N + total_sent, not_written);
         if (nsent < 0) {
             perror("Error! Could not write to socket (1) successfully.");

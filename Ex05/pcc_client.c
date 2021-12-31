@@ -34,6 +34,7 @@ int main(int argc, char** argv)
     FILE *file;
     int N, i;
     uint32_t N_read;
+    uint32_t C;
     uint32_t serv_N;
     char *buff_N;
     int nsent, nread;
@@ -142,8 +143,8 @@ int main(int argc, char** argv)
     close(sockfd);
 
     // --- Stage 4 ------
-    N_read = ntohl(serv_N);
-    printf("# of printable characters: %u\n", N_read);
+    C = ntohl(serv_N);
+    printf("# of printable characters: %u\n", C);
 
     // --- Stage 5 ------
     exit(0);

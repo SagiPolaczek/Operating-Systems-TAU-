@@ -27,6 +27,7 @@ void shutdown_srv();
 int connfd = -1;
 int error_flag = 0;
 int sigint_flag = 0;
+// --- Stage 1 ------
 counts count = {0};
 
 /*
@@ -58,6 +59,7 @@ int main(int argc, char** argv)
     uint32_t serv_N, serv_count;
     char *serv_count_p;
     int not_read, not_written;
+    int tmp_C;
     
 
     if (argc != 2){
@@ -72,6 +74,8 @@ int main(int argc, char** argv)
         perror("Error! Could not initialize sigint handler successfully.");
         exit(1);
     }
+
+    // --- Stage 2 ------
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     status = listenfd;
@@ -103,6 +107,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
+    // --- Stage 3 ------
     while (1) {
         if (sigint_flag == 1) {
             shutdown_srv();
@@ -149,8 +154,6 @@ int main(int argc, char** argv)
         }
 
         N = ntohl(serv_N);
-        //debug
-        printf("N from server is:%u\n", N);
 
         buff = (char *) malloc(N);
         if (buff == NULL) {
@@ -186,9 +189,10 @@ int main(int argc, char** argv)
         }
 
         // Process data received
+        tmp_C = 0;
         for (i = 0; i < N; i++) {
             if (is_printable(buff[i])) {
-                count.total += 1;
+                tmp_C += 1;
             }
         }
         
@@ -221,12 +225,14 @@ int main(int argc, char** argv)
             }
 
         }
-
+        // Update the global DS.
+        // Only in this stage so TCP errors won't bug the counts.
         for (i = 0; i < N; i++) {
             if (is_printable(buff[i])) {
                 count.printable_counts[((int)buff[i] - 32)] += 1;
             }
         }
+        count.total += tmp_C;
 
         close(connfd);
         connfd = -1;
@@ -269,8 +275,10 @@ void my_sigint_handler()
 */
 void shutdown_srv() {
     int i;
+    // Print chars as requested.
     for (i = 0; i < 95; i++) {
         printf("char '%c' : %u times\n", 
                 i+32, count.printable_counts[i]);
     }
+    exit(0);
 }

@@ -196,7 +196,7 @@ int main(int argc, char** argv)
             }
         }
         
-        serv_count = htonl(count.total);
+        serv_count = htonl(tmp_C);
         serv_count_p = (char*)&serv_count;
         total_sent = 0;
         not_written = 4;

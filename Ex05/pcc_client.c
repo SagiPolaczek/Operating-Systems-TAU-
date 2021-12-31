@@ -123,6 +123,8 @@ int main(int argc, char** argv)
             perror("Error! Could not write to socket (2) successfully.");
             exit(1);
         }
+        total_sent += nsent;
+        not_written -= nsent;
     }
     free(buff);
     

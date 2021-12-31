@@ -44,6 +44,7 @@ int main(int argc, char** argv)
     int port, status;
     char* buff;
     sockaddr_in serv_addr;
+    int scanned;
 
     if (argc != 4) {
         perror("Error! Invalid amount of argumnets. should be 3.");
@@ -86,7 +87,11 @@ int main(int argc, char** argv)
         exit(1);
     }
     for (i = 0; i < N; i++) {
-        fscanf(file, "%c", &buff[i]);
+        scanned = fscanf(file, "%c", &buff[i]);
+        if (scanned <= 0) {
+            perror("Error! Could not fscanf successfully.");
+            exit(1);
+        }
     }
     fclose(file);
 
